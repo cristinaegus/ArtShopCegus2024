@@ -1,0 +1,97 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+
+const artworks = [
+  {
+    id: "1",
+    title: "Plaza Eliptica",
+    price: 50,
+    image: "/images/BilbaoPlazaEliptica.jpg",
+    description: "A vibrant cityscape with  whatercolors."
+  },
+  {
+    id: "2",
+    title: "Cafe de Paris ",
+    price: 80,
+    image: "/images/ParisCafe.jpg",
+    description: "A modern interpretation of city life in Paris ."
+  },
+  {
+    id: "3",
+    title: "Santurce Boats",
+    price: 60,
+    image: "/images/SanturceBoats.jpg",
+    description: "A small port in Santurce."
+  },
+  {
+    id: "4",
+    title: "New York Bridge",
+    price: 50,
+    image: "/images/NewYokbridege.jpg",
+    description: "A modern interpretation of colorful  New York city."
+  },
+];
+---
+
+<Layout title="Art Shop | Browse Artworks">
+	<main class="max-w-6xl mx-auto px-4 py-8">
+		<h1 class="text-4xl font-bold text-center mb-8">Browse Artworks</h1>
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{artworks.map(artwork => (
+				<div class="bg-white rounded-lg shadow-md overflow-hidden">
+					<img src={artwork.image} alt={artwork.title} class="w-full h-48 object-cover"/>
+					<div class="p-4">
+						<h2 class="text-xl font-semibold mb-2">{artwork.title}</h2>
+						<p class="text-gray-600 mb-4">{artwork.description}</p>
+						<div class="flex justify-between items-center">
+							<span class="text-lg font-bold text-purple-600">€{artwork.price}</span>
+							<button 
+                class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition duration-300 add-to-cart-btn"
+                data-item={JSON.stringify(artwork)}
+                
+              >
+								Add to Cart
+							</button>
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	</main>
+</Layout>
+
+<script>
+  import { addToCart } from '../Store/cartStore';
+
+  document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+      const target = e.target as HTMLButtonElement;
+      const itemData = JSON.parse(target.dataset.item || '{}');
+      addToCart(itemData);
+
+      // Show feedback
+      const originalText = target.textContent;
+      target.textContent = 'Added!';
+      target.disabled = true;
+
+      setTimeout(() => {
+        target.textContent = originalText;
+        target.disabled = false;
+      }, 1500);
+    });
+  });
+</script>
+<style>
+	.add-to-cart-btn {
+	  background-color: #b0e127;
+	  color: #fff;
+	  padding: 10px 20px;
+	  border: none;
+	  border-radius: 5px;
+	  cursor: pointer;
+	}
+	.add-to-cart-btn:hover {
+	  background-color: #444;
+	}
+  </style>

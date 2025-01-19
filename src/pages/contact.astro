@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Contact | Art Shop">
+	<main class="max-w-6xl mx-auto px-4 py-8">
+		<h1 class="text-4xl font-bold text-center mb-8">Contact Me</h1>
+		<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+			<form class="space-y-6">
+				<div>
+					<label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+					<input 
+						type="text" 
+						id="name" 
+						name="name" 
+						class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+					/>
+				</div>
+				<div>
+					<label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+					<input 
+						type="email" 
+						id="email" 
+						name="email" 
+						class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+					/>
+				</div>
+				<div>
+					<label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+					<textarea 
+						id="message" 
+						name="message" 
+						rows="4" 
+						class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+					></textarea>
+				</div>
+				<div>
+					<button 
+						type="submit" 
+						class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition duration-300"
+					>
+						Send Message
+					</button>
+				</div>
+			</form>
+			<div class="mt-8 pt-8 border-t border-gray-200">
+				<h2 class="text-xl font-semibold mb-4">Other Ways to Reach Me</h2>
+				<div class="space-y-4">
+					<p class="flex items-center text-gray-600">
+						<span class="font-medium mr-2">Email:</span> 
+						contact@artshop.com
+					</p>
+					<p class="flex items-center text-gray-600">
+						<span class="font-medium mr-2">Phone:</span> 
+						+1 (555) 123-4567
+					</p>
+					<p class="flex items-center text-gray-600">
+						<span class="font-medium mr-2">Address:</span> 
+						123 Art Street, New York, NY 10001
+					</p>
+				</div>
+			</div>
+		</div>
+	</main>
+</Layout>

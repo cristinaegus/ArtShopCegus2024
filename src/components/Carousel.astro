@@ -1,0 +1,115 @@
+<!-- Carousel.astro -->
+
+<style>
+    .carousel {
+        position: relative;
+        width: 50%; /* ajusta el ancho del carrusel */
+        height: 300px; /* ajusta el alto del carrusel */
+        margin: 40px auto; /* centra el carrusel en la página */
+    }
+  
+    .carousel img {
+        width: 100%; /* ajusta el ancho de las imágenes */
+        height: 100%;
+        margin: 10px auto;
+        contain: size; /* ajusta el alto de las imágenes */
+        object-fit: cover;
+    }
+  
+    .carousel .slides {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  
+    .carousel .slides img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s;
+    }
+  
+    .carousel .slides img.active {
+      opacity: 1;
+    }
+  
+    .carousel .slides img.inactive {
+      opacity: 0;
+    }
+  
+    .carousel .controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+    }
+  
+    .carousel .controls button {
+      background-color: rgb(64, 137, 226);
+      border: none;
+      padding: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
+    }
+  
+    .carousel .controls button:hover {
+      background-color: rgba(218, 25, 25, 0.5);
+    }
+  </style>
+  
+  <div class="carousel">
+    <div class="slides">
+      <img src="/images/PuenteColgante.jpg" alt="Imagen 1" class="active"width={"50px"}height={"50px"}>
+      <img src="/images/CiscoHouse.jpg" alt="Imagen 2" class="inactive">
+      <img src="/images/SanturceBoats.jpg" alt="Imagen 3" class="inactive">
+    </div>
+    <div class="controls">
+      <button class="prev">Anterior</button>
+      <button class="next">Siguiente</button>
+    </div>
+  </div>
+  
+  <script>
+    const carousel = document.querySelector('.carousel');
+    const slides = carousel.querySelector('.slides');
+    const images = slides.querySelectorAll('img');
+    const controls = carousel.querySelector('.controls');
+    const prevButton = controls.querySelector('.prev');
+    const nextButton = controls.querySelector('.next');
+  
+    let currentSlide = 0;
+  
+    function showSlide() {
+      images.forEach((image, index) => {
+        if (index === currentSlide) {
+          image.classList.add('active');
+          image.classList.remove('inactive');
+        } else {
+          image.classList.add('inactive');
+          image.classList.remove('active');
+        }
+      });
+    }
+  
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % images.length;
+      showSlide();
+    }
+  
+    function prevSlide() {
+      currentSlide = (currentSlide - 1 + images.length) % images.length;
+      showSlide();
+    }
+  
+    prevButton.addEventListener('click', prevSlide);
+    nextButton.addEventListener('click', nextSlide);
+  
+    showSlide();
+  </script>

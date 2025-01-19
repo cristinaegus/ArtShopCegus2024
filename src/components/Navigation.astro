@@ -1,0 +1,26 @@
+---
+import ShoppingCart from './ShoopingCart.astro';
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1); // Remove the first "/"
+---
+
+<nav class="bg-white shadow-lg">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex justify-between">
+      <div class="flex space-x-7">
+        <div class="flex items-center py-4">
+          <span class="font-semibold text-gray-500 text-lg">ArtShop</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <a href="/" class={`py-4 px-2 ${currentPath === '' ? 'text-purple-500 border-b-4 border-purple-500' : 'text-gray-500 hover:text-purple-500 transition duration-300'}`}>Home</a>
+          <a href="/artshop" class={`py-4 px-2 ${currentPath === 'artshop' ? 'text-purple-500 border-b-4 border-purple-500' : 'text-gray-500 hover:text-purple-500 transition duration-300'}`}>Art Shop</a>
+          <a href="/about" class={`py-4 px-2 ${currentPath === 'about' ? 'text-purple-500 border-b-4 border-purple-500' : 'text-gray-500 hover:text-purple-500 transition duration-300'}`}>About Me</a>
+          <a href="/contact" class={`py-4 px-2 ${currentPath === 'contact' ? 'text-purple-500 border-b-4 border-purple-500' : 'text-gray-500 hover:text-purple-500 transition duration-300'}`}>Contact</a>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <ShoppingCart />
+      </div>
+    </div>
+  </div>
+</nav>
