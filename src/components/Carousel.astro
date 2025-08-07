@@ -1,115 +1,208 @@
-<!-- Carousel.astro -->
-
 <style>
+  .carousel {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    box-shadow: 0 6px 32px rgba(80, 0, 120, 0.13), 0 1.5px 6px rgba(0,0,0,0.08);
+    background: linear-gradient(135deg, #f3e8ff 0%, #fff 100%);
+    border: 1.5px solid #e9d5ff;
+  }
+  .slides {
+    display: flex;
+    transition: transform 0.7s cubic-bezier(.4,2,.6,1);
+  }
+  .slide {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(120deg, #ede9fe 0%, #f9fafb 100%);
+    position: relative;
+    padding: 1.5rem 0;
+  }
+  .slide img {
+    width: 90%;
+    max-width: 600px;
+    height: 340px;
+    object-fit: cover;
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 24px rgba(80, 0, 120, 0.10);
+    border: 2px solid #c4b5fd;
+    background: #fff;
+    transition: transform 0.3s;
+  }
+  .slide img:hover {
+    transform: scale(1.03) rotate(-1deg);
+    box-shadow: 0 8px 32px rgba(80, 0, 120, 0.18);
+  }
+  .controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .control-btn {
+    background: linear-gradient(135deg, #a78bfa 60%, #c4b5fd 100%);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(80, 0, 120, 0.13);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    outline: none;
+    border: 2px solid #ede9fe;
+  }
+  .control-btn:hover {
+    background: #7c3aed;
+    color: #fff;
+    transform: scale(1.08);
+    border-color: #a78bfa;
+  }
+  .indicators {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+  }
+  .indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s, transform 0.2s;
+    box-shadow: 0 1px 4px rgba(80, 0, 120, 0.08);
+  }
+  .indicator.active {
+    background: #7c3aed;
+    border-color: #a78bfa;
+    transform: scale(1.18);
+  }
+  @media (max-width: 800px) {
     .carousel {
-        position: relative;
-        width: 50%; /* ajusta el ancho del carrusel */
-        height: 300px; /* ajusta el alto del carrusel */
-        margin: 40px auto; /* centra el carrusel en la página */
+      max-width: 98vw;
+      border-radius: 1rem;
     }
-  
-    .carousel img {
-        width: 50%; /* ajusta el ancho de las imágenes */
-        height: 50%;
-        margin: 10px auto;
-        contain: size; /* ajusta el alto de las imágenes */
-        
+    .slide img {
+      height: 200px;
+      max-width: 98vw;
     }
-  
-    .carousel .slides {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+  }
+  @media (max-width: 500px) {
+    .carousel {
+      border-radius: 0.7rem;
     }
-  
-    .carousel .slides img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: opacity 0.5s;
+    .slide img {
+      height: 120px;
+      border-radius: 0.7rem;
     }
-  
-    .carousel .slides img.active {
-      opacity: 1;
+    .control-btn {
+      width: 36px;
+      height: 36px;
+      font-size: 1.3rem;
     }
-  
-    .carousel .slides img.inactive {
-      opacity: 0;
+    .indicators {
+      gap: 0.4rem;
     }
-  
-    .carousel .controls {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      text-align: center;
+    .indicator {
+      width: 10px;
+      height: 10px;
     }
-  
-    .carousel .controls button {
-      background-color: rgb(64, 137, 226);
-      border: none;
-      padding: 10px;
-      font-size: 24px;
-      cursor: pointer;
-      color: white;
-    }
-  
-    .carousel .controls button:hover {
-      background-color: rgba(218, 25, 25, 0.5);
-    }
-  </style>
-  
-  <div class="carousel">
-    <div class="slides">
-      <img src="/images/PuenteColgante.jpg" alt="Imagen 1" class="active"width={"50px"}height={"50px"}>
-      <img src="/images/CiscoHouse.jpg" alt="Imagen 2" class="inactive">
-      <img src="/images/SanturceBoats.jpg" alt="Imagen 3" class="inactive">
-    </div>
-    <div class="controls">
-      <button class="prev">Anterior</button>
-      <button class="next">Siguiente</button>
-    </div>
+  }
+</style>
+
+<div class="carousel">
+  <div class="slides" id="carousel-slides">
+    <div class="slide"><img src="/images/BaterraHouse.jpg" alt="Baterra House" /></div>
+    <div class="slide"><img src="/images/BilbaoPlazaEliptica.jpg" alt="Bilbao Plaza Elíptica" /></div>
+    <div class="slide"><img src="/images/ParisCafe.jpg" alt="Paris Café" /></div>
+    <div class="slide"><img src="/images/PuenteColgante.jpg" alt="Puente Colgante" /></div>
+    <div class="slide"><img src="/images/SanturceBoats.jpg" alt="Santurce Boats" /></div>
+    <!-- Puedes añadir más imágenes aquí -->
   </div>
-  
-  <script>
-    const carousel = document.querySelector('.carousel');
-    const slides = carousel.querySelector('.slides');
-    const images = slides.querySelectorAll('img');
-    const controls = carousel.querySelector('.controls');
-    const prevButton = controls.querySelector('.prev');
-    const nextButton = controls.querySelector('.next');
-  
-    let currentSlide = 0;
-  
-    function showSlide() {
-      images.forEach((image, index) => {
-        if (index === currentSlide) {
-          image.classList.add('active');
-          image.classList.remove('inactive');
-        } else {
-          image.classList.add('inactive');
-          image.classList.remove('active');
-        }
+  <div class="controls">
+    <button class="control-btn" id="carousel-prev" aria-label="Anterior">&#8592;</button>
+    <button class="control-btn" id="carousel-next" aria-label="Siguiente">&#8594;</button>
+  </div>
+  <div class="indicators" id="carousel-indicators"></div>
+</div>
+
+<script type="text/javascript">
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const prevButton = document.getElementById('carousel-prev');
+  const nextButton = document.getElementById('carousel-next');
+  const indicatorsContainer = document.getElementById('carousel-indicators');
+
+  // Crear indicadores
+  function renderIndicators() {
+    indicatorsContainer.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'indicator' + (i === currentSlide ? ' active' : '');
+      dot.addEventListener('click', () => {
+        goToSlide(i);
       });
+      indicatorsContainer.appendChild(dot);
     }
-  
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % images.length;
-      showSlide();
-    }
-  
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + images.length) % images.length;
-      showSlide();
-    }
-  
-    prevButton.addEventListener('click', prevSlide);
-    nextButton.addEventListener('click', nextSlide);
-  
+  }
+
+  function showSlide() {
+    slides.forEach((slide, idx) => {
+      slide.style.display = idx === currentSlide ? 'flex' : 'none';
+    });
+    renderIndicators();
+  }
+
+  function goToSlide(idx) {
+    currentSlide = idx;
     showSlide();
-  </script>
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide();
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    showSlide();
+  }
+
+  prevButton.addEventListener('click', prevSlide);
+  nextButton.addEventListener('click', nextSlide);
+
+  // Swipe para móvil
+  let startX = null;
+  const slidesContainer = document.getElementById('carousel-slides');
+  slidesContainer.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+  });
+  slidesContainer.addEventListener('touchend', (e) => {
+    if (startX === null) return;
+    const endX = e.changedTouches[0].clientX;
+    if (endX - startX > 50) prevSlide();
+    else if (startX - endX > 50) nextSlide();
+    startX = null;
+  });
+
+  // Inicializar
+  showSlide();
+</script>
