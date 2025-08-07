@@ -8,7 +8,22 @@ export interface CartItem {
   image: string;
 }
 
-export const cartItems = atom<CartItem[]>([]);
+// Persistencia en localStorage
+const STORAGE_KEY = 'cartItems';
+function loadCartFromStorage(): CartItem[] {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) return JSON.parse(data);
+  } catch {}
+  return [];
+}
+export const cartItems = atom<CartItem[]>(loadCartFromStorage());
+
+cartItems.subscribe((items) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {}
+});
 
 export function addToCart(item: Omit<CartItem, 'quantity'>) {
   const currentItems = cartItems.get();

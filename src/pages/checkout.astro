@@ -13,8 +13,9 @@ import { cartItems, getTotal } from '../Store/cartStore';
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
           <div class="space-y-4" id="checkout-items">
-            <!-- Items will be populated by JavaScript -->
+            <div id="checkout-loading" class="text-center text-gray-400">Loading your cart...</div>
           </div>
+          <div id="cart-summary-info" class="mt-4 text-sm text-gray-700"></div>
         </div>
 
         <!-- Shipping Information -->
@@ -99,31 +100,131 @@ import { cartItems, getTotal } from '../Store/cartStore';
 <script>
   import { cartItems, getTotal } from '../Store/cartStore';
 
+  // Función para calcular el subtotal sumando precio * cantidad de cada producto
+  function calculateSubtotal(items) {
+    if (!Array.isArray(items)) return 0;
+    // Log para depuración
+    console.log('Carrito recibido para calcular subtotal:', items);
+    const subtotal = items.reduce((acc, item) => {
+      // Si no hay quantity, asumir 1
+      const cantidad = (typeof item.quantity === 'number' && !isNaN(item.quantity)) ? item.quantity : 1;
+      if (typeof item.price !== 'number' || isNaN(item.price)) {
+        console.warn('Item sin datos correctos:', item);
+        return acc;
+      }
+      return acc + (item.price * cantidad);
+    }, 0);
+    console.log('Subtotal calculado:', subtotal);
+    return subtotal;
+  }
+
+  // Función para obtener el resumen del carrito
+  function getCartSummary() {
+    const items = cartItems.get();
+    const subtotal = calculateSubtotal(items);
+    const shipping = 9.99;
+    const total = subtotal + shipping;
+    return {
+      items,
+      subtotal,
+      shipping,
+      total
+    };
+  }
+
+  // Mostrar el resumen del carrito en la interfaz
+  function renderCartSummaryInfo() {
+    const summary = getCartSummary();
+    const infoDiv = document.getElementById('cart-summary-info');
+    if (!infoDiv) return;
+    if (!Array.isArray(summary.items) || summary.items.length === 0) {
+      infoDiv.textContent = '';
+      return;
+    }
+    infoDiv.innerHTML = `
+      <div><strong>Productos en carrito:</strong> ${summary.items.length}</div>
+      <div><strong>Subtotal:</strong> €${summary.subtotal.toFixed(2)}</div>
+      <div><strong>Envío:</strong> €${summary.shipping.toFixed(2)}</div>
+      <div><strong>Total:</strong> €${summary.total.toFixed(2)}</div>
+    `;
+  }
+
   function updateOrderSummary() {
     const items = cartItems.get();
     const checkoutItems = document.getElementById('checkout-items');
     const subtotalElement = document.getElementById('subtotal');
     const totalElement = document.getElementById('total');
-    
-    if (items.length === 0) {
-      window.location.href = '/artshop';
+    const loadingDiv = document.getElementById('checkout-loading');
+
+    // Esperar a que el store esté realmente inicializado
+    if (!Array.isArray(items)) {
+      if (loadingDiv) loadingDiv.textContent = 'Loading your cart...';
       return;
     }
 
-    const subtotal = getTotal();
+    if (items.length === 0) {
+      if (loadingDiv) loadingDiv.textContent = 'Your cart is empty.';
+      // Ya no redirige automáticamente, solo muestra el mensaje
+      return;
+    }
+    // Mostrar advertencia solo si falta el precio
+    if (!items.every(item => typeof item.price === 'number')) {
+      if (loadingDiv) loadingDiv.textContent = 'Error: Los productos del carrito no tienen datos válidos.';
+      return;
+    }
+
+    if (loadingDiv) loadingDiv.remove();
+
+    const subtotal = calculateSubtotal(items);
     const shipping = 9.99;
     const total = subtotal + shipping;
 
-    checkoutItems.innerHTML = items.map(item => `
+    checkoutItems.innerHTML = items.map(item => {
+      const cantidad = (typeof item.quantity === 'number' && !isNaN(item.quantity)) ? item.quantity : 1;
+      return `
       <div class="flex items-center space-x-4">
         <img src="${item.image}" alt="${item.title}" class="w-16 h-16 object-cover rounded"/>
         <div class="flex-1">
           <h3 class="text-sm font-medium">${item.title}</h3>
-          <p class="text-sm text-gray-500">Quantity: ${item.quantity}</p>
-          <p class="text-sm font-medium">€${(item.price * item.quantity).toFixed(2)}</p>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Quantity: ${cantidad}</span>
+            <button class="decrease-qty-btn bg-gray-200 hover:bg-gray-300 text-gray-700 rounded px-2 py-1 text-xs" data-id="${item.id}">-</button>
+            <button class="increase-qty-btn bg-gray-200 hover:bg-gray-300 text-gray-700 rounded px-2 py-1 text-xs" data-id="${item.id}">+</button>
+          </div>
+          <p class="text-sm font-medium">€${(item.price * cantidad).toFixed(2)}</p>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
+
+    // Añadir eventos a los botones de disminuir cantidad
+    document.querySelectorAll('.decrease-qty-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = btn.getAttribute('data-id');
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        if (item.quantity > 1) {
+          import('../Store/cartStore').then(store => {
+            store.updateQuantity(id, item.quantity - 1);
+          });
+        } else {
+          import('../Store/cartStore').then(store => {
+            store.removeFromCart(id);
+          });
+        }
+      });
+    });
+    // Añadir eventos a los botones de aumentar cantidad
+    document.querySelectorAll('.increase-qty-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = btn.getAttribute('data-id');
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        import('../Store/cartStore').then(store => {
+          store.updateQuantity(id, item.quantity + 1);
+        });
+      });
+    });
 
     subtotalElement.textContent = `€${subtotal.toFixed(2)}`;
     totalElement.textContent = `€${total.toFixed(2)}`;
@@ -140,10 +241,16 @@ import { cartItems, getTotal } from '../Store/cartStore';
     }
 
     const formData = new FormData(form);
+    const itemsPedido = cartItems.get();
+    const subtotalPedido = calculateSubtotal(itemsPedido);
+    const shippingPedido = 9.99;
+    const totalPedido = subtotalPedido + shippingPedido;
     const orderData = {
       customer: Object.fromEntries(formData),
-      items: cartItems.get(),
-      total: getTotal() + 9.99
+      items: itemsPedido,
+      subtotal: subtotalPedido,
+      shipping: shippingPedido,
+      total: totalPedido
     };
 
     try {
@@ -162,9 +269,12 @@ import { cartItems, getTotal } from '../Store/cartStore';
     }
   });
 
-  // Update order summary when cart changes
-  cartItems.subscribe(updateOrderSummary);
-  
+  // Update order summary and cart summary info when cart changes
+  cartItems.subscribe(() => {
+    updateOrderSummary();
+    renderCartSummaryInfo();
+  });
   // Initial render
   updateOrderSummary();
+  renderCartSummaryInfo();
 </script>

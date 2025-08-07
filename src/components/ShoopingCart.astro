@@ -2,8 +2,8 @@
 import { removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
 ---
 
-<div class="relative group" id="shopping-cart">
-  <button class="p-2 hover:text-purple-500">
+<div class="relative" id="shopping-cart">
+  <button class="p-2 hover:text-purple-500" id="cart-toggle-btn">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
@@ -12,7 +12,7 @@ import { removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
     </span>
   </button>
   
-  <div class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg hidden group-hover:block">
+  <div class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg" id="cart-dropdown" style="display: none;">
     <div class="p-4">
       <h3 class="text-lg font-semibold mb-4">Shopping Cart</h3>
       <div class="cart-items">
@@ -23,6 +23,24 @@ import { removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
 </div>
 
 <script>
+  // --- Mantener visible el carrito unos segundos tras salir con el mouse ---
+  let hideTimeout;
+  const cartToggleBtn = document.getElementById('cart-toggle-btn');
+  const cartDropdown = document.getElementById('cart-dropdown');
+
+  function showCart() {
+    clearTimeout(hideTimeout);
+    cartDropdown.style.display = 'block';
+  }
+  function hideCart() {
+    hideTimeout = setTimeout(() => {
+      cartDropdown.style.display = 'none';
+    }, 600); // 600ms de retardo
+  }
+  cartToggleBtn.addEventListener('mouseenter', showCart);
+  cartToggleBtn.addEventListener('mouseleave', hideCart);
+  cartDropdown.addEventListener('mouseenter', showCart);
+  cartDropdown.addEventListener('mouseleave', hideCart);
   import { cartItems, removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
 
   const cartItemsContainer = document.querySelector('.cart-items');
@@ -67,7 +85,7 @@ import { removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
           <span class="font-semibold">Total:</span>
           <span class="text-purple-500 font-semibold">€${total.toFixed(2)}</span>
         </div>
-        <a href="/checkout" class="block w-full">
+        <a href="/checkout" class="block w-full" id="proceed-to-checkout-link">
           <button class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300">
             Proceed to Checkout
           </button>
@@ -77,6 +95,19 @@ import { removeFromCart, updateQuantity, getTotal } from '../Store/cartStore';
 
     // Add event listeners to the new elements
     setupEventListeners();
+    // Evitar que el carrito se oculte al hacer clic en el enlace de checkout
+    const checkoutLink = document.getElementById('proceed-to-checkout-link');
+    if (checkoutLink) {
+      checkoutLink.addEventListener('mousedown', (e) => {
+        // No ocultar el carrito al hacer clic, dejar que la navegación ocurra normalmente
+        // y el menú se cerrará solo al cambiar de página
+        // Si quieres forzar el cierre, puedes hacerlo aquí, pero no es necesario
+      });
+    }
+    // Si el carrito tiene elementos, mostrar el dropdown si el mouse está sobre el botón
+    if (cartDropdown && cartDropdown.style.display === 'block') {
+      showCart();
+    }
   }
 
   function setupEventListeners() {
